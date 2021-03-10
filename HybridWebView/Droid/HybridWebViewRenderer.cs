@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
@@ -14,6 +15,7 @@ using Plugin.HybridWebView.Shared;
 using Plugin.HybridWebView.Shared.Delegates;
 using Plugin.HybridWebView.Shared.Enumerations;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 using Xamarin.Forms.Platform.Android;
 
 [assembly: ExportRenderer(typeof(HybridWebViewControl), typeof(HybridWebViewRenderer))]
@@ -420,10 +422,10 @@ namespace Plugin.HybridWebView.Droid
             // Add Global Headers
             var client = new HttpClient();
 
-            Element.LocalRegisteredHeaders.ToObservable()
-                .Merge(HybridWebViewControl.GlobalRegisteredHeaders.ToObservable().Where(_ => Element.EnableGlobalHeaders))
+            Element.LocalRegisteredHeaders
+                .Concat(HybridWebViewControl.GlobalRegisteredHeaders.Where(_ => Element.EnableGlobalHeaders))
                 .Where(header => !headers.ContainsKey(header.Key))
-                .Subscribe(header =>
+                .ForEach(header =>
                 {
                     var (key, value) = header;
                     headers.Add(key, value);

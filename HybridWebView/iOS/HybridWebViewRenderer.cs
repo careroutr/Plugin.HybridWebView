@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Foundation;
 using Plugin.HybridWebView.iOS;
@@ -14,6 +15,7 @@ using Xamarin.Forms;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
+using Xamarin.Forms.Internals;
 
 [assembly: ExportRenderer(typeof(HybridWebViewControl), typeof(HybridWebViewRenderer))]
 namespace Plugin.HybridWebView.iOS
@@ -318,13 +320,10 @@ namespace Plugin.HybridWebView.iOS
 
             var headers = new NSMutableDictionary();
             
-            Element.LocalRegisteredHeaders.ToObservable()
-                .Merge(HybridWebViewControl.GlobalRegisteredHeaders.ToObservable().Where(_ => Element.EnableGlobalHeaders))
+            Element.LocalRegisteredHeaders
+                .Concat(HybridWebViewControl.GlobalRegisteredHeaders.Where(_ => Element.EnableGlobalHeaders))
                 .Where(header => !headers.ContainsKey((NSString) header.Key))
-                .Subscribe(header =>
-                {
-                    headers.Add((NSString) header.Key, (NSString) header.Value);
-                });
+                .ForEach(header => headers.Add((NSString) header.Key, (NSString) header.Value));
             
             var url = new NSUrl(Element.Source);
             var request = new NSMutableUrlRequest(url)
