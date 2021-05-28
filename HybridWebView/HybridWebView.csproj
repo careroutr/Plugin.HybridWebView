@@ -96,6 +96,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'MonoAndroid10.0'">
     <PackageReference Include="System.Reactive" Version="5.0.0" />
+    <PackageReference Include="Xamarin.AndroidX.RecyclerView" Version="1.2.0" />
   </ItemGroup>
 
 
